@@ -361,6 +361,11 @@ class StrategyState:
                 click.minion_beat_minion(my_index, self.my_minion_num,
                                          oppo_index, self.oppo_minion_num)
 
+    def my_all_minion_attack_hero(self):
+        for my_index, my_minion in enumerate(self.my_minions):
+            if my_minion.can_beat_face:
+                click.minion_beat_hero(my_index, self.my_minion_num)
+
     def copy_new_one(self):
         # TODO: 有必要deepcopy吗
         tmp = copy.deepcopy(self)

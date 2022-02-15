@@ -11,6 +11,7 @@ ID2CARD_DICT = {
     "TOTEMIC_CALL": TotemicCall,
     "LESSER_HEAL": LesserHeal,
     "BALLISTA_SHOT": BallistaShot,
+    "ARMOR_UP": ArmorUp,
 
     # 标准模式-牧师
     "YOP_032": ArmorVendor,  # 护甲商贩
@@ -54,4 +55,7 @@ ID2CARD_DICT = {
     "VAN_NEW1_041": StampedingKodo,
     "VAN_EX1_590": BloodKnight,
     "VAN_EX1_247": StormforgedAxe,
+    #经典战士
+    "VAN_CS2_106": RedBurnAxe,
+    "VAN_EX1_407": DesperateFighting,
 }

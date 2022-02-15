@@ -61,6 +61,28 @@ class LightningStorm(SpellNoPoint):
                       oppo_minion.delta_h_after_damage(3 + spell_power)) / 2
 
         return h_sum + cls.bias,
+# 乱斗
+class DesperateFighting(SpellNoPoint):
+    bias = -5
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        spell_power = state.my_total_spell_power
+
+        # 优势不能乱斗
+        if state.my_heuristic_value >= state.oppo_heuristic_value:
+            return 0,
+        #如果对方minion3个以上，并且比我们属性多
+        if state.oppo_minion_num >= 3:
+            return state.oppo_heuristic_value - state.my_heuristic_value+cls.bias,
+        return cls.bias,
+        
+    @classmethod
+    def use_with_arg(cls, state, card_index, *args):
+        state.my_all_minion_attack_hero()
+        click.choose_and_use_spell(card_index, state.my_hand_card_num)
+        click.cancel_click()
+        time.sleep(cls.wait_time)
 
 
 # TC130
@@ -163,7 +185,7 @@ class EarthenRingFarseer(MinionPointMine):
 
 # 憎恶
 class Abomination(MinionNoPoint):
-    keep_in_hand_bool = True
+    keep_in_hand_bool = False
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
@@ -258,6 +280,24 @@ class StormforgedAxe(WeaponCard):
             for oppo_minion in state.touchable_oppo_minions:
                 # 如果能提起刀解了, 那太好了
                 if oppo_minion.health <= 2 and \
+                        not oppo_minion.divine_shield:
+                    return 2000,
+
+        return cls.value,
+        
+class RedBurnAxe(WeaponCard):
+    keep_in_hand_bool = True
+    value = 1.5
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        # 不要已经有刀了再顶刀
+        if state.my_weapon is not None:
+            return 0,
+        if state.my_total_mana == 2:
+            for oppo_minion in state.touchable_oppo_minions:
+                # 如果能提起刀解了, 那太好了
+                if oppo_minion.health <= 3 and \
                         not oppo_minion.divine_shield:
                     return 2000,
 
