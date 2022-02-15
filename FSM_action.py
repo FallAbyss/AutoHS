@@ -237,6 +237,10 @@ def Battling():
             mine_count = 0
 
             not_mine_count += 1
+            #太久了就发表情
+            if not_mine_count == 200:
+                if random.random() < 0.5:
+                    click.emoj()
             if not_mine_count >= 400:
                 warn_print("Time out in Opponent's turn")
                 return FSM_ERROR
@@ -252,7 +256,9 @@ def Battling():
             # game_num_turns_in_play在每一个回合开始时都会加一, 即
             # 后手放第一个回合这个数是2
             if log_state.game_num_turns_in_play <= 2:
-                click.emoj(0)
+                # click.emoj(0)
+                if random.random() < 0.5:
+                    click.emoj(0)
             else:
                 # 在之后每个回合开始时有概率发表情
                 if random.random() < EMOJ_RATIO:
