@@ -51,6 +51,9 @@ class BallistaShot(HeroPowerCard):
 class ArmorUp(HeroPowerCard):
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
+        #如果我方优势增加分数
+        if state.my_heuristic_value -6 > state.oppo_heuristic_value :
+            return state.my_heuristic_value - state.oppo_heuristic_value -5,
         return 1,-1
 
     @classmethod

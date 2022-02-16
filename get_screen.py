@@ -118,8 +118,8 @@ def get_state():
 
     im_opencv = catch_screen()
 
-    print("当前定位点------------")
-    print(im_opencv[1070][1090][:3])
+    # print("当前定位点------------")
+    # print(im_opencv[1070][1090][:3])
     # 先y轴再z轴
     if list(im_opencv[1070][1090][:3]) == [23, 52, 105] or \
             list(im_opencv[305][705][:3]) == [21, 43, 95] or \

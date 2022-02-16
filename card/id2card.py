@@ -57,5 +57,8 @@ ID2CARD_DICT = {
     "VAN_EX1_247": StormforgedAxe,
     #经典战士
     "VAN_CS2_106": RedBurnAxe,
+    "VAN_EX1_410": AmorSlams,
+    "VAN_EX1_606": AmorBlock,
     "VAN_EX1_407": DesperateFighting,
+    "VAN_EX1_400": fufufu,
 }

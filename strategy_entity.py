@@ -283,6 +283,7 @@ class StrategyMinion(StrategyEntity):
         return temp_minion.heuristic_val - self.heuristic_val
 
 
+
 class StrategyWeapon(StrategyEntity):
     def __init__(self, card_id, zone, zone_pos,
                  current_cost, overload, is_mine,
@@ -426,6 +427,9 @@ class StrategyHero(StrategyEntity):
         temp_hero = copy.copy(self)
         temp_hero.get_heal(heal)
         return temp_hero.heuristic_val - self.heuristic_val
+        
+    def delta_h_after_amor(self, amor):
+        return amor / 2
 
 
 class StrategySpell(StrategyEntity):

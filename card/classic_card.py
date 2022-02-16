@@ -23,6 +23,42 @@ class LightingBolt(SpellPointOppo):
 
         return best_delta_h + cls.bias, best_oppo_index,
 
+# 盾牌格挡
+class AmorBlock(SpellNoPoint):
+    keep_in_hand_bool = False
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_h = state.my_hero.delta_h_after_amor(5)
+        if state.my_hero.health <= 5:
+            best_h += 4
+
+        return best_h,
+
+# 盾猛
+class AmorSlams(SpellPointOppo):
+    keep_in_hand_bool = False
+    spell_type = SPELL_POINT_OPPO
+    bias = -4
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_delta_h = 0
+        best_oppo_index = -1
+        
+        spell_power = state.my_total_spell_power
+        damage = state.my_hero.armor + spell_power
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            delta_h = oppo_minion.delta_h_after_damage(damage)
+            if best_delta_h < delta_h:
+                best_delta_h = delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h + cls.bias, best_oppo_index,
+
 
 # 呱
 class Hex(SpellPointOppo):
@@ -63,18 +99,21 @@ class LightningStorm(SpellNoPoint):
         return h_sum + cls.bias,
 # 乱斗
 class DesperateFighting(SpellNoPoint):
-    bias = -5
-
+    bias = -3
+    keep_in_hand_bool = False
+    
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
-        spell_power = state.my_total_spell_power
 
         # 优势不能乱斗
         if state.my_heuristic_value >= state.oppo_heuristic_value:
-            return 0,
+            return cls.bias,
         #如果对方minion3个以上，并且比我们属性多
         if state.oppo_minion_num >= 3:
-            return state.oppo_heuristic_value - state.my_heuristic_value+cls.bias,
+            dfValue = state.oppo_heuristic_value - state.my_heuristic_value + cls.bias
+            print("乱斗得分为")
+            print(dfValue)
+            return dfValue,
         return cls.bias,
         
     @classmethod
@@ -83,7 +122,37 @@ class DesperateFighting(SpellNoPoint):
         click.choose_and_use_spell(card_index, state.my_hand_card_num)
         click.cancel_click()
         time.sleep(cls.wait_time)
+# 旋风斩
+class fufufu(SpellNoPoint):
+    keep_in_hand_bool = False
 
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        spell_power = state.my_total_spell_power
+        car_damage = spell_power + 1
+        h_sum = 0
+        for oppo_minion in state.oppo_minions:
+            h_sum += oppo_minion.delta_h_after_damage(car_damage)
+        for my_minion in state.my_minions:
+            h_sum -= my_minion.delta_h_after_damage(car_damage)
+        return h_sum,
+
+
+# 加盾男爵
+class buinYou(MinionNoPoint):
+    value = 2
+    keep_in_hand_bool = False
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        h_sum = 0
+        for oppo_minion in state.oppo_minions:
+            h_sum += oppo_minion.delta_h_after_damage(2)
+        for my_minion in state.my_minions:
+            h_sum -= my_minion.delta_h_after_damage(2)
+        h_sum += state.oppo_hero.delta_h_after_damage(2)
+        h_sum -= state.my_hero.delta_h_after_damage(2)
+        return cls.value + h_sum,
 
 # TC130
 class MindControlTech(MinionNoPoint):
@@ -106,7 +175,7 @@ class FeralSpirit(SpellNoPoint):
 
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
-        if state.my_minion_num >= 7:
+        if state.my_minion_num >= 6:
             return -1, 0
         else:
             return cls.value, 0
@@ -266,7 +335,7 @@ class DoomSayer(MinionNoPoint):
         else:
             return state.oppo_heuristic_value - state.my_heuristic_value,
 
-
+#雷铸战斧
 class StormforgedAxe(WeaponCard):
     keep_in_hand_bool = True
     value = 1.5
@@ -285,6 +354,7 @@ class StormforgedAxe(WeaponCard):
 
         return cls.value,
         
+#小斧子
 class RedBurnAxe(WeaponCard):
     keep_in_hand_bool = True
     value = 1.5

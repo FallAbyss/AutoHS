@@ -1,3 +1,4 @@
+from ctypes.wintypes import PINT
 import random
 import sys
 import time
@@ -146,6 +147,8 @@ def MatchingAction():
             return FSM_CHOOSING_HERO
 
         loop_count += 1
+        # print("寻找对手计时器")
+        # print(loop_count)
         if loop_count >= 60:
             warn_print("Time out in Matching Opponent")
             return FSM_ERROR
@@ -202,7 +205,7 @@ def ChoosingCardAction():
         if loop_count >= 60:
             warn_print("Time out in Choosing Opponent")
             return FSM_ERROR
-        time.sleep(STATE_CHECK_INTERVAL)
+        time.sleep(CHOOSE_CARD_INTERVAL)
 
 
 def Battling():
@@ -238,7 +241,11 @@ def Battling():
 
             not_mine_count += 1
             #太久了就发表情
-            if not_mine_count == 200:
+            if not_mine_count == 60:
+                if random.random() < EMOJ_RATIO:
+                    click.emoj()
+            #太久了就发表情
+            if not_mine_count == 100:
                 if random.random() < 0.5:
                     click.emoj()
             if not_mine_count >= 400:
@@ -257,7 +264,7 @@ def Battling():
             # 后手放第一个回合这个数是2
             if log_state.game_num_turns_in_play <= 2:
                 # click.emoj(0)
-                if random.random() < 0.5:
+                if random.random() < 0.3:
                     click.emoj(0)
             else:
                 # 在之后每个回合开始时有概率发表情
@@ -276,9 +283,9 @@ def Battling():
             click.cancel_click()
             time.sleep(STATE_CHECK_INTERVAL)
 
-        debug_print("-" * 60)
+        # debug_print("-" * 60)
         strategy_state = StrategyState(log_state)
-        strategy_state.debug_print_out()
+        # strategy_state.debug_print_out()
 
         # 考虑要不要出牌
         index, args = strategy_state.best_h_index_arg()
