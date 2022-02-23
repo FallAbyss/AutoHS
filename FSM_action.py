@@ -85,18 +85,18 @@ def print_out():
     global time_begin
     global game_count
 
-    sys_print("Enter State " + str(FSM_state))
+    # sys_print("Enter State " + str(FSM_state))
 
     if FSM_state == FSM_LEAVE_HS:
         warn_print("HearthStone not found! Try to go back to HS")
 
     if FSM_state == FSM_CHOOSING_CARD:
         game_count += 1
-        sys_print("The " + str(game_count) + " game begins")
+        # sys_print("The " + str(game_count) + " game begins")
         time_begin = time.time()
 
     if FSM_state == FSM_QUITTING_BATTLE:
-        sys_print("The " + str(game_count) + " game ends")
+        # sys_print("The " + str(game_count) + " game ends")
         time_now = time.time()
         if time_begin > 0:
             info_print("The last game last for : {} mins {} secs"
@@ -190,9 +190,9 @@ def ChoosingCardAction():
                 should_keep_in_hand = \
                     detail_card.keep_in_hand(strategy_state, my_hand_index)
 
-            if not has_print:
-                debug_print(f"手牌-[{my_hand_index}]({my_hand_card.name})"
-                            f"是否保留: {should_keep_in_hand}")
+            # if not has_print:
+            #     debug_print(f"手牌-[{my_hand_index}]({my_hand_card.name})"
+            #                 f"是否保留: {should_keep_in_hand}")
 
             if not should_keep_in_hand:
                 click.replace_starting_card(my_hand_index, hand_card_num)
@@ -374,7 +374,7 @@ def MainMenuAction():
 def WaitMainMenu():
     print_out()
     while get_screen.get_state() != FSM_MAIN_MENU:
-        click.click_middle()
+        click.enter_battle_mode()
         time.sleep(5)
     return FSM_MAIN_MENU
 
@@ -411,6 +411,7 @@ def FSM_dispatch(next_state):
         FSM_WAIT_MAIN_MENU: WaitMainMenu,
     }
 
+    debug_print(f"当前状态为：+{next_state}")
     if next_state not in dispatch_dict:
         error_print("Unknown state!")
         sys.exit()

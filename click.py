@@ -5,11 +5,58 @@ import pywintypes
 import time
 from pynput.mouse import Button, Controller
 import random
+# import get_screen
 import sys
 
 from constants.constants import *
 from print_info import *
 from get_screen import *
+
+
+#测试不同分辨率的点击效果，因为屏幕截取未支持不同分辨率，失败了
+#炉石传说坐标
+# hwnd_left,hwnd_top, hwnd_right, hwnd_bottom = 0,0,0,0
+# hwnd_width  = 0
+# hwnd_height = 0
+
+#获取炉石传说的分辨率
+#得到不同分辨率下的点击位置
+# def hs_size():
+#     hwnd = get_HS_hwnd()
+#     global hwnd_left 
+#     global hwnd_top 
+#     global hwnd_right 
+#     global hwnd_bottom 
+#     hwnd_left,hwnd_top,hwnd_right,hwnd_bottom = win32gui.GetWindowRect(hwnd)
+#     # print(left)
+#     # print(top)
+#     # print(right)
+#     # print(bottom)
+#     global hwnd_width 
+#     global hwnd_height
+#     hwnd_width = hwnd_right - hwnd_left -16
+#     hwnd_height = hwnd_bottom - hwnd_top -39
+#     print(hwnd_width)
+#     print(hwnd_height)
+#     # 1440 900 = 1456 939
+#     # 16 39
+#     # 1400 1050 = 1416 1089 
+#     # 16 39
+
+# def position_x(x):
+#     global hwnd_width 
+#     global hwnd_left 
+#     if hwnd_width == 0:
+#      return x
+#     return x * (hwnd_width / 1920) + 16 + hwnd_left 
+
+# def position_y(y):
+#     global hwnd_height
+#     global hwnd_top 
+#     if hwnd_height == 0:
+#      return y
+#     return y * (hwnd_height / 1920) + 39 + hwnd_top 
+
 
 
 def rand_sleep(interval):
@@ -19,8 +66,8 @@ def rand_sleep(interval):
 
 
 def click_button(x, y, button):
-    x += random.randint(-5, 5)
-    y += random.randint(-5, 5)
+    # x = position_x(x)
+    # y = position_y(y)
     mouse = Controller()
     rand_sleep(0.1)
     mouse.position = (x, y)
@@ -31,6 +78,8 @@ def click_button(x, y, button):
 
 
 def left_click(x, y):
+    x += random.randint(-2, 3)
+    y += random.randint(-2, 3)
     click_button(x, y, Button.left)
 
 

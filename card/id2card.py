@@ -40,20 +40,24 @@ ID2CARD_DICT = {
     "DMF_053": BloodOfGhuun,  # 戈霍恩之血
 
     # 经典模式
-    "VAN_CS2_042": FireElemental,
+    #经典中立
+    "VAN_EX1_012": xieFa,
+    "VAN_EX1_016": Sylvanas,
     "VAN_EX1_562": Onyxia,
-    "VAN_EX1_248": FeralSpirit,
-    "VAN_EX1_246": Hex,
-    "VAN_EX1_238": LightingBolt,
     "VAN_EX1_085": MindControlTech,
     "VAN_EX1_284": AzureDrake,
-    "VAN_EX1_259": LightningStorm,
     "VAN_CS2_189": ElvenArcher,
     "VAN_CS2_117": EarthenRingFarseer,
     "VAN_EX1_097": Abomination,
     "VAN_NEW1_021": DoomSayer,
     "VAN_NEW1_041": StampedingKodo,
     "VAN_EX1_590": BloodKnight,
+    #经典萨满
+    "VAN_CS2_042": FireElemental,
+    "VAN_EX1_248": FeralSpirit,
+    "VAN_EX1_246": Hex,
+    "VAN_EX1_238": LightingBolt,
+    "VAN_EX1_259": LightningStorm,
     "VAN_EX1_247": StormforgedAxe,
     #经典战士
     "VAN_CS2_106": RedBurnAxe,
@@ -61,4 +65,5 @@ ID2CARD_DICT = {
     "VAN_EX1_606": AmorBlock,
     "VAN_EX1_407": DesperateFighting,
     "VAN_EX1_400": fufufu,
+    "VAN_EX1_402": AromrMaeker,
 }

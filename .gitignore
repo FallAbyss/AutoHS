@@ -8,3 +8,6 @@ test*
 *.log
 *.txt
 !requirements.txt
+
+dist/
+build/

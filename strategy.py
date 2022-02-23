@@ -206,8 +206,55 @@ class StrategyState:
         for oppo_minion in self.oppo_minions:
             if oppo_minion.taunt and not oppo_minion.stealth:
                 return True
-
         return False
+    @property
+    def i_has_taunt(self):
+        for my_minion in self.my_minions:
+            if my_minion.taunt and not my_minion.stealth:
+                return True
+        return False
+
+    @property
+    def how_demage_aop(self):
+        has_e = False
+        for oppo_minion in self.oppo_minions:
+            if oppo_minion.card_id == "VAN_EX1_097": 
+                has_e = True
+        for my_minion in self.my_minions:
+            if my_minion.card_id == "VAN_EX1_097": 
+                has_e = True
+        aop_demage = 0
+        if has_e:
+            aop_demage += 2
+
+        return aop_demage
+        
+    #场面局势
+    @property
+    def scene_situation(self):  
+        total_h_val = 0 
+        if self.my_weapon:
+            total_h_val += self.my_weapon.heuristic_val
+        for minion in self.my_minions:
+            total_h_val += minion.heuristic_val
+        if self.oppo_weapon:
+            total_h_val -= self.oppo_weapon.heuristic_val
+        for minion in self.oppo_minions:
+            total_h_val -= minion.heuristic_val
+        return total_h_val      
+        
+    #血量局势
+    @property
+    def i_go_dead(self):
+        emm_sorry = 0
+        #可能直接死
+        if self.my_hero.health + self.my_hero.armor < 7:
+            emm_sorry += 8 - self.my_hero.health + self.my_hero.armor
+        #可能冲锋死
+        elif self.my_hero.health + self.my_hero.armor < 12 :
+            emm_sorry += 1
+
+        return self.my_hero.health +  self.my_hero.armor < 10       
 
     @property
     def my_total_attack(self):
@@ -264,12 +311,14 @@ class StrategyState:
     def get_best_attack_target(self):
         touchable_oppo_minions = self.touchable_oppo_minions
         has_taunt = self.oppo_has_taunt
+        aop_demage = self.how_demage_aop
+        dangerous = self.i_go_dead
         beat_face_win = self.my_total_attack >= self.oppo_hero.health
 
         max_delta_h_val = 0
         max_my_index = -2
         max_oppo_index = -2
-        min_attack = 0
+        # min_attack = 0
 
         # 枚举每一个己方随从
         for my_index, my_minion in enumerate(self.my_minions):
@@ -296,25 +345,38 @@ class StrategyState:
                     max_delta_h_val = tmp_delta_h
                     max_my_index = my_index
                     max_oppo_index = -1
-                    min_attack = 999
+                    # min_attack = 999
 
             for oppo_minion in touchable_oppo_minions:
                 oppo_index = oppo_minion.zone_pos - 1
 
-                tmp_delta_h = 0
-                tmp_delta_h -= my_minion.delta_h_after_damage(oppo_minion.attack)
-                tmp_delta_h += oppo_minion.delta_h_after_damage(my_minion.attack)
-
+                detail_card = my_minion.detail_card
+                aom_tmp_delta_h = 0
+                if detail_card is None:
+                    aom_tmp_delta_h -= my_minion.delta_h_after_damage(oppo_minion.attack)
+                    aom_tmp_delta_h += oppo_minion.delta_h_after_damage(my_minion.attack)
+                else:
+                    #放入随从类
+                    aom_tmp_delta_h = my_minion.detail_card.\
+                        best_attack_oppon_target(self,my_index,oppo_index)
                 # debug_print(f"攻击决策：[{my_index}]({my_minion.name})->"
                 #             f"[{oppo_index}]({oppo_minion.name}) "
                 #             f"delta_h_val: {tmp_delta_h}")
 
-                if tmp_delta_h > max_delta_h_val or \
-                        tmp_delta_h == max_delta_h_val and my_minion.attack < min_attack:
-                    max_delta_h_val = tmp_delta_h
+
+                #如果可能死在AOP下，鼓励解怪
+                if aop_demage >= my_minion.health:
+                    aom_tmp_delta_h += 1
+                #如果没血了,而且不是嘲讽，鼓励解怪
+                if dangerous > 1 and not my_minion.taunt:
+                    aom_tmp_delta_h += 1
+
+
+                if aom_tmp_delta_h >= max_delta_h_val :
+                    max_delta_h_val = aom_tmp_delta_h
                     max_my_index = my_index
                     max_oppo_index = oppo_index
-                    min_attack = my_minion.attack
+                    # min_attack = my_minion.attack
 
         # 试一试英雄攻击
         if self.my_hero.can_attack:
@@ -337,6 +399,10 @@ class StrategyState:
                 # debug_print(f"攻击决策: [-1]({self.my_hero.name})->"
                 #             f"[{oppo_index}]({oppo_minion.name}) "
                 #             f"delta_h_val: {tmp_delta_h}")
+
+                #血多就打人
+                if dangerous == 0:
+                    tmp_delta_h += 1
 
                 if tmp_delta_h >= max_delta_h_val:
                     max_delta_h_val = tmp_delta_h
@@ -378,6 +444,7 @@ class StrategyState:
         return tmp
 
     def best_h_index_arg(self):
+        dangerous = self.i_go_dead
         # debug_print()
         best_delta_h = 0
         best_index = -2
@@ -405,6 +472,10 @@ class StrategyState:
                 # debug_print(f"卡牌-[{hand_card_index}]({hand_card.name}) "
                             # f"delta_h: {delta_h}, *args: {args} (手写行为)")
 
+
+            #如果没血了,鼓励嘲讽
+            if dangerous > 1 and hand_card.cardtype=="minion" and hand_card.taunt:
+                aom_tmp_delta_h += 1
             if delta_h > best_delta_h:
                 best_delta_h = delta_h
                 best_index = hand_card_index

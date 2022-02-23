@@ -57,6 +57,7 @@ CRITICAL_MINION = {
     "VAN_EX1_004": 1.5,  # 年轻的女祭司
     "VAN_EX1_095": 1.5,  # 加基森拍卖师
     "VAN_EX1_044": 1.5,  # 任务达人
+    "VAN_NEW1_021": 2,  # 末日
 }
 
 
@@ -238,6 +239,7 @@ class StrategyMinion(StrategyEntity):
                 h_val += 3
         if self.life_steal:
             h_val += self.attack / 2 + self.health / 4
+
         h_val += self.poisonous
 
         if self.zone == "HAND":
@@ -281,6 +283,7 @@ class StrategyMinion(StrategyEntity):
         temp_minion = copy.copy(self)
         temp_minion.get_heal(heal)
         return temp_minion.heuristic_val - self.heuristic_val
+
 
 
 
@@ -429,7 +432,7 @@ class StrategyHero(StrategyEntity):
         return temp_hero.heuristic_val - self.heuristic_val
         
     def delta_h_after_amor(self, amor):
-        return amor / 2
+        return amor / 3
 
 
 class StrategySpell(StrategyEntity):

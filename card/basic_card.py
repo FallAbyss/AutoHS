@@ -20,10 +20,20 @@ class Card(ABC):
     # 一些功能卡不能用一个简单的数值去评判价值, 应针对其另写
     # 函数
     value = 0
+    
+    # plan_additional计划值，用于在预计之后的牌时使用，比如：盾牌格挡时计算盾猛就增加5点
+    plan_additional = 0
 
     # 返回两个东西,第一项是使用这张卡的\delta h,
     # 之后是是用这张卡的最佳参数,参数数目不定
     # 参数是什么呢,比如一张火球术,参数就是指示你
+    # 是要打脸还是打怪
+    # @classmethod
+    # def best_h_and_arg(cls, state, hand_card_index,plan_additional):
+    #     cls.plan_additional = plan_additional
+    #     value = cls.best_h_and_arg()
+    #     cls.plan_additional = 0
+    #     return value,
     # 是要打脸还是打怪
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
@@ -42,6 +52,8 @@ class Card(ABC):
 
 class SpellCard(Card):
     wait_time = BASIC_SPELL_WAIT_TIME
+
+    ex_demage = 0
 
     @classmethod
     def get_card_type(cls):
@@ -94,6 +106,33 @@ class MinionCard(Card):
     def get_card_type(cls):
         return CARD_MINION
 
+    #默认没亡语
+    @classmethod
+    def bias_dead_delta_h(self,state,my_index,oppo_index):
+        return 0
+
+    #默认没攻击目标加成
+    @classmethod
+    def attack_target_delta_h(self,state,my_index,oppo_index):
+        return 0
+        
+    @classmethod
+    def best_attack_oppon_target(cls, state,my_index,oppo_index):
+        oppo_minion = state.oppo_minions[oppo_index]
+        my_minion = state.my_minions[my_index]
+        
+        tmp_delta_h = 0
+        tmp_delta_h -= my_minion.delta_h_after_damage(oppo_minion.attack)
+        tmp_delta_h += oppo_minion.delta_h_after_damage(my_minion.attack)
+
+        #攻击目标加成
+        tmp_delta_h += my_minion.detail_card.attack_target_delta_h(state,my_index,oppo_index)
+        #如果死了，判断亡语
+        if my_minion.get_damaged(oppo_minion.attack):
+            tmp_delta_h += my_minion.detail_card.bias_dead_delta_h(state,my_index,oppo_index)
+        return tmp_delta_h
+        
+
     @classmethod
     def basic_delta_h(cls, state, hand_card_index):
         if state.my_minion_num >= 7:
@@ -127,6 +166,19 @@ class MinionCard(Card):
             # 有飞刀可以多下怪
             if my_minion.card_id == "VAN_NEW1_019":
                 h_sum += 0.5
+            # 有憎恶就别下2血怪了
+            if my_minion.card_id == "VAN_EX1_097" \
+                and state.my_hand_cards[hand_card_index].health <= 2:
+                h_sum += -1000
+                
+        for oppo_minion in state.oppo_minions:
+            # 对手有末日就别下怪了
+            if oppo_minion.card_id == "VAN_NEW1_021":
+                h_sum += -1000
+            # 对手有憎恶就别下2血怪了
+            if oppo_minion.card_id == "VAN_EX1_097" \
+                and state.my_hand_cards[hand_card_index].health <= 2:
+                h_sum += -1000
 
         return h_sum
 
