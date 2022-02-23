@@ -373,9 +373,13 @@ def MainMenuAction():
 
 def WaitMainMenu():
     print_out()
+    wait_main_menu_count = 0
     while get_screen.get_state() != FSM_MAIN_MENU:
         click.enter_battle_mode()
         time.sleep(5)
+        wait_main_menu_count += 1
+        if wait_main_menu_count >= 5:
+            break
     return FSM_MAIN_MENU
 
 
@@ -425,6 +429,7 @@ def AutoHS_automata():
     if get_screen.test_hs_available():
         hs_hwnd = get_screen.get_HS_hwnd()
         get_screen.move_window_foreground(hs_hwnd)
+        time.sleep(0.5)
 
     while 1:
         if quitting_flag:
